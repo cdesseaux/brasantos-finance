@@ -1,0 +1,108 @@
+<h2>Formulário de novo lançamento</h2>
+<p class="subtitle">Como deve ser o fluxo de entrada rápida? Você disse que essa é a tela mais usada.</p>
+
+<div class="options">
+
+  <div class="option" data-choice="single" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>⭐ Formulário único com tipo (Despesa / Receita)</h3>
+      <p>Um botão "+" abre um drawer/modal. Seleciona o tipo e os campos mudam dinamicamente.</p>
+      <div class="mockup" style="margin-top:12px">
+        <div class="mockup-header">Mobile — Novo Lançamento (Despesa)</div>
+        <div class="mockup-body" style="max-width:320px;margin:0 auto;padding:16px;font-size:12px">
+          <div style="display:flex;gap:0;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:16px">
+            <div style="flex:1;padding:8px;text-align:center;background:#3b82f6;color:white;font-weight:600">Despesa</div>
+            <div style="flex:1;padding:8px;text-align:center;color:#64748b">Receita (NF)</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+            <div>
+              <div class="label">Empresa</div>
+              <select class="mock-input" style="font-size:11px;padding:6px;width:100%">
+                <option>BRASANTOS</option>
+                <option>JJB SERV</option>
+                <option>JJB ADM</option>
+              </select>
+            </div>
+            <div>
+              <div class="label">Competência</div>
+              <input class="mock-input" value="01/2026" style="font-size:11px;padding:6px;width:100%">
+            </div>
+          </div>
+          <div style="margin-bottom:10px">
+            <div class="label">Conta (categoria)</div>
+            <select class="mock-input" style="font-size:11px;padding:6px;width:100%">
+              <option>DESPESAS FIXAS — Aluguel</option>
+              <option>DESPESAS FIXAS — Condomínio</option>
+              <option>ENCARGOS — FGTS</option>
+            </select>
+          </div>
+          <div style="margin-bottom:10px">
+            <div class="label">Fornecedor</div>
+            <input class="mock-input" placeholder="Buscar fornecedor..." style="font-size:11px;padding:6px;width:100%">
+          </div>
+          <div style="margin-bottom:10px">
+            <div class="label">Descrição</div>
+            <input class="mock-input" placeholder="Ex: Aluguel Sala 613 — 01/26" style="font-size:11px;padding:6px;width:100%">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+            <div>
+              <div class="label">Vencimento</div>
+              <input class="mock-input" value="10/01/2026" style="font-size:11px;padding:6px;width:100%">
+            </div>
+            <div>
+              <div class="label">Valor Principal</div>
+              <input class="mock-input" value="R$ 1.808,57" style="font-size:11px;padding:6px;width:100%">
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+            <div>
+              <div class="label">Multa</div>
+              <input class="mock-input" value="R$ 0,00" style="font-size:11px;padding:6px;width:100%">
+            </div>
+            <div>
+              <div class="label">Juros</div>
+              <input class="mock-input" value="R$ 0,00" style="font-size:11px;padding:6px;width:100%">
+            </div>
+            <div>
+              <div class="label">Status</div>
+              <select class="mock-input" style="font-size:11px;padding:6px;width:100%">
+                <option>PAGO</option>
+                <option>A PAGAR</option>
+              </select>
+            </div>
+          </div>
+          <button class="mock-button" style="width:100%;padding:10px;font-size:13px;border-radius:8px">Salvar Lançamento</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="split" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Dois botões separados: "+ Despesa" e "+ Receita"</h3>
+      <p>FAB (floating action button) com dois atalhos diretos. Vai direto ao formulário sem escolher tipo.</p>
+      <div class="mockup" style="margin-top:12px">
+        <div class="mockup-header">Mobile — FAB expandido</div>
+        <div class="mockup-body" style="max-width:280px;margin:0 auto;padding:16px;font-size:12px;position:relative;min-height:140px">
+          <div style="position:absolute;bottom:16px;right:16px;display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="background:#1e293b;color:white;padding:4px 10px;border-radius:20px;font-size:11px">Nova Receita (NF)</span>
+              <div style="width:36px;height:36px;background:#22c55e;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:16px">+</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="background:#1e293b;color:white;padding:4px 10px;border-radius:20px;font-size:11px">Nova Despesa</span>
+              <div style="width:36px;height:36px;background:#ef4444;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:16px">−</div>
+            </div>
+            <div style="width:44px;height:44px;background:#3b82f6;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:22px;box-shadow:0 4px 12px rgba(59,130,246,0.4)">+</div>
+          </div>
+          <div style="color:#94a3b8;font-size:11px;padding-top:8px">Lista de lançamentos...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:16px">Clique para selecionar ou responda no terminal. Opção A é mais eficiente para mobile.</p>

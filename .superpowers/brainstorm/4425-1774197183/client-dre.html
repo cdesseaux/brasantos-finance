@@ -1,0 +1,161 @@
+<h2>Situação por Cliente — DRE com rateio</h2>
+<p class="subtitle">Visão do resultado de cada cliente: receita, despesas diretas e indiretas proporcionais. Dois layouts possíveis.</p>
+
+<div class="options">
+
+  <div class="option" data-choice="drilled" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>⭐ Lista de clientes → detalhe ao clicar</h3>
+      <p>Tela principal mostra ranking de clientes do mês. Clica num cliente para ver o DRE completo dele.</p>
+
+      <div class="split" style="margin-top:12px">
+        <div class="mockup">
+          <div class="mockup-header">Lista — Jan 2026</div>
+          <div class="mockup-body" style="font-size:11px;padding:12px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:10px;align-items:center">
+              <select class="mock-input" style="font-size:11px;padding:4px 6px">
+                <option>Janeiro 2026</option>
+              </select>
+              <select class="mock-input" style="font-size:11px;padding:4px 6px">
+                <option>Todas empresas</option>
+              </select>
+            </div>
+            <!-- cliente 1 -->
+            <div style="border:1px solid #e2e8f0;border-radius:6px;padding:10px;margin-bottom:6px;cursor:pointer">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                <span style="font-weight:600">ATLANTIS</span>
+                <span style="font-weight:700;color:#22c55e">+R$ 8.340</span>
+              </div>
+              <div style="display:flex;gap:12px;font-size:10px;color:#64748b">
+                <span>Receita: R$ 24.300</span>
+                <span>Desp. direta: R$ 12.100</span>
+                <span>Desp. indireta: R$ 3.860</span>
+              </div>
+              <div style="margin-top:6px;background:#e2e8f0;border-radius:4px;height:4px">
+                <div style="background:#22c55e;height:4px;border-radius:4px;width:34%"></div>
+              </div>
+              <div style="font-size:10px;color:#64748b;margin-top:2px">13,7% da receita total · margem 34%</div>
+            </div>
+            <!-- cliente 2 -->
+            <div style="border:1px solid #e2e8f0;border-radius:6px;padding:10px;margin-bottom:6px;cursor:pointer">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                <span style="font-weight:600">RIO PARANÁ</span>
+                <span style="font-weight:700;color:#22c55e">+R$ 5.210</span>
+              </div>
+              <div style="display:flex;gap:12px;font-size:10px;color:#64748b">
+                <span>Receita: R$ 14.796</span>
+                <span>Desp. direta: R$ 7.420</span>
+                <span>Desp. indireta: R$ 2.166</span>
+              </div>
+              <div style="margin-top:6px;background:#e2e8f0;border-radius:4px;height:4px">
+                <div style="background:#22c55e;height:4px;border-radius:4px;width:35%"></div>
+              </div>
+              <div style="font-size:10px;color:#64748b;margin-top:2px">8,3% da receita total · margem 35%</div>
+            </div>
+            <!-- cliente 3 deficitário -->
+            <div style="border:1px solid #fecaca;border-radius:6px;padding:10px;cursor:pointer">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                <span style="font-weight:600">JARDIM DOS IPÊS</span>
+                <span style="font-weight:700;color:#ef4444">−R$ 1.240</span>
+              </div>
+              <div style="display:flex;gap:12px;font-size:10px;color:#64748b">
+                <span>Receita: R$ 9.400</span>
+                <span>Desp. direta: R$ 8.800</span>
+                <span>Desp. indireta: R$ 1.840</span>
+              </div>
+              <div style="margin-top:6px;background:#e2e8f0;border-radius:4px;height:4px">
+                <div style="background:#ef4444;height:4px;border-radius:4px;width:10%"></div>
+              </div>
+              <div style="font-size:10px;color:#ef4444;margin-top:2px">5,3% da receita total · margem −13% ⚠️</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mockup">
+          <div class="mockup-header">Detalhe — ATLANTIS · Jan 2026</div>
+          <div class="mockup-body" style="font-size:11px;padding:12px">
+            <div style="background:#f0f9ff;border-radius:6px;padding:10px;margin-bottom:12px;display:flex;justify-content:space-between">
+              <div style="text-align:center"><div style="font-size:10px;color:#2563eb">RECEITA</div><div style="font-weight:700;font-size:14px">R$ 24.300</div></div>
+              <div style="text-align:center"><div style="font-size:10px;color:#64748b">PARTICIPAÇÃO</div><div style="font-weight:700;font-size:14px">13,7%</div></div>
+              <div style="text-align:center"><div style="font-size:10px;color:#22c55e">RESULTADO</div><div style="font-weight:700;font-size:14px;color:#22c55e">+R$ 8.340</div></div>
+            </div>
+
+            <div style="font-weight:600;margin-bottom:6px;color:#1e293b">Despesas Diretas&nbsp;<span style="font-weight:400;color:#64748b">(lançadas para este cliente)</span></div>
+            <div style="border:1px solid #e2e8f0;border-radius:4px;overflow:hidden;margin-bottom:12px">
+              <div style="display:grid;grid-template-columns:1fr 70px;padding:5px 8px;background:#f8fafc;font-size:10px;color:#64748b;font-weight:600"><span>DESCRIÇÃO</span><span style="text-align:right">VALOR</span></div>
+              <div style="display:grid;grid-template-columns:1fr 70px;padding:5px 8px;border-top:1px solid #f1f5f9"><span>FGTS — Colaboradores</span><span style="text-align:right">R$ 8.420</span></div>
+              <div style="display:grid;grid-template-columns:1fr 70px;padding:5px 8px;border-top:1px solid #f1f5f9"><span>GPS — INSS</span><span style="text-align:right">R$ 2.180</span></div>
+              <div style="display:grid;grid-template-columns:1fr 70px;padding:5px 8px;border-top:1px solid #f1f5f9;background:#f8fafc;font-weight:600"><span>Subtotal diretas</span><span style="text-align:right">R$ 12.100</span></div>
+            </div>
+
+            <div style="font-weight:600;margin-bottom:6px;color:#1e293b">Despesas Indiretas&nbsp;<span style="font-weight:400;color:#64748b">(rateio 13,7% do overhead)</span></div>
+            <div style="border:1px solid #e2e8f0;border-radius:4px;overflow:hidden;margin-bottom:12px">
+              <div style="display:grid;grid-template-columns:1fr 70px;padding:5px 8px;background:#f8fafc;font-size:10px;color:#64748b;font-weight:600"><span>DESCRIÇÃO</span><span style="text-align:right">RATEADO</span></div>
+              <div style="display:grid;grid-template-columns:1fr 70px;padding:5px 8px;border-top:1px solid #f1f5f9"><span>Aluguel Sala 613</span><span style="text-align:right">R$ 248</span></div>
+              <div style="display:grid;grid-template-columns:1fr 70px;padding:5px 8px;border-top:1px solid #f1f5f9"><span>Contabilidade</span><span style="text-align:right">R$ 36</span></div>
+              <div style="display:grid;grid-template-columns:1fr 70px;padding:5px 8px;border-top:1px solid #f1f5f9"><span>Telefonia / Internet</span><span style="text-align:right">R$ 33</span></div>
+              <div style="display:grid;grid-template-columns:1fr 70px;padding:5px 8px;border-top:1px solid #f1f5f9"><span>Demais overhead</span><span style="text-align:right">R$ 3.543</span></div>
+              <div style="display:grid;grid-template-columns:1fr 70px;padding:5px 8px;border-top:1px solid #f1f5f9;background:#f8fafc;font-weight:600"><span>Subtotal indiretas</span><span style="text-align:right">R$ 3.860</span></div>
+            </div>
+
+            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:10px;display:flex;justify-content:space-between;align-items:center">
+              <span style="font-weight:700">RESULTADO LÍQUIDO</span>
+              <span style="font-weight:700;font-size:16px;color:#15803d">+R$ 8.340</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="table" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Tabela cruzada (todos clientes × meses)</h3>
+      <p>Visão de planilha: clientes nas linhas, meses nas colunas. Boa para comparar evolução mensal.</p>
+      <div class="mockup" style="margin-top:12px">
+        <div class="mockup-header">DRE por Cliente — 2026</div>
+        <div class="mockup-body" style="font-size:10px;padding:10px;overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse">
+            <tr style="background:#f8fafc">
+              <th style="padding:6px;text-align:left;border-bottom:1px solid #e2e8f0;white-space:nowrap">Cliente</th>
+              <th style="padding:6px;text-align:right;border-bottom:1px solid #e2e8f0">Jan</th>
+              <th style="padding:6px;text-align:right;border-bottom:1px solid #e2e8f0">Fev</th>
+              <th style="padding:6px;text-align:right;border-bottom:1px solid #e2e8f0">Mar</th>
+              <th style="padding:6px;text-align:right;border-bottom:1px solid #e2e8f0">...</th>
+              <th style="padding:6px;text-align:right;border-bottom:1px solid #e2e8f0">Total</th>
+            </tr>
+            <tr>
+              <td style="padding:6px;border-bottom:1px solid #f1f5f9;font-weight:600">ATLANTIS</td>
+              <td style="padding:6px;text-align:right;border-bottom:1px solid #f1f5f9;color:#22c55e">+8.340</td>
+              <td style="padding:6px;text-align:right;border-bottom:1px solid #f1f5f9;color:#22c55e">+7.900</td>
+              <td style="padding:6px;text-align:right;border-bottom:1px solid #f1f5f9;color:#22c55e">+8.100</td>
+              <td style="padding:6px;text-align:right;border-bottom:1px solid #f1f5f9;color:#64748b">...</td>
+              <td style="padding:6px;text-align:right;border-bottom:1px solid #f1f5f9;font-weight:700;color:#22c55e">+24.340</td>
+            </tr>
+            <tr>
+              <td style="padding:6px;border-bottom:1px solid #f1f5f9;font-weight:600">RIO PARANÁ</td>
+              <td style="padding:6px;text-align:right;border-bottom:1px solid #f1f5f9;color:#22c55e">+5.210</td>
+              <td style="padding:6px;text-align:right;border-bottom:1px solid #f1f5f9;color:#22c55e">+4.800</td>
+              <td style="padding:6px;text-align:right;border-bottom:1px solid #f1f5f9;color:#22c55e">+5.100</td>
+              <td style="padding:6px;text-align:right;border-bottom:1px solid #f1f5f9;color:#64748b">...</td>
+              <td style="padding:6px;text-align:right;border-bottom:1px solid #f1f5f9;font-weight:700;color:#22c55e">+15.110</td>
+            </tr>
+            <tr>
+              <td style="padding:6px;font-weight:600">JARDIM DOS IPÊS</td>
+              <td style="padding:6px;text-align:right;color:#ef4444">−1.240</td>
+              <td style="padding:6px;text-align:right;color:#22c55e">+320</td>
+              <td style="padding:6px;text-align:right;color:#ef4444">−890</td>
+              <td style="padding:6px;text-align:right;color:#64748b">...</td>
+              <td style="padding:6px;text-align:right;font-weight:700;color:#ef4444">−1.810</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:16px">Clique para selecionar ou responda no terminal. As duas abordagens podem coexistir (lista + tabela como abas).</p>

@@ -1,0 +1,70 @@
+<h2>Qual stack usar para o app?</h2>
+<p class="subtitle">3 abordagens 100% gratuitas — analise e escolha a que faz mais sentido para você</p>
+
+<div class="options">
+
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>⭐ Next.js + Supabase <span style="font-size:0.75em;color:#22c55e;font-weight:600;">RECOMENDADO</span></h3>
+      <p style="margin-bottom:8px"><strong>Frontend:</strong> Next.js 14 (React) + Tailwind CSS + shadcn/ui &nbsp;→&nbsp; deploy no <strong>Vercel</strong> (grátis)<br>
+      <strong>Backend/Banco:</strong> <strong>Supabase</strong> — PostgreSQL relacional + autenticação + API automática (grátis, 500MB)</p>
+      <div class="pros-cons" style="margin-top:8px">
+        <div class="pros"><h4>Pontos fortes</h4><ul>
+          <li>Banco relacional (PostgreSQL) — ideal para dados financeiros com queries complexas</li>
+          <li>Auth pronto (login com e-mail, sessão segura)</li>
+          <li>Responsivo e rápido no celular com Tailwind</li>
+          <li>Stack mais popular do mercado hoje — fácil de manter/evoluir</li>
+        </ul></div>
+        <div class="cons"><h4>Atenção</h4><ul>
+          <li>Supabase pausa após 1 semana sem acesso (resolvido com cron gratuito)</li>
+          <li>500MB de banco no free tier (suficiente para anos de dados)</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>React SPA (Vite) + Supabase</h3>
+      <p style="margin-bottom:8px"><strong>Frontend:</strong> React 18 + Vite + Tailwind &nbsp;→&nbsp; deploy no <strong>Netlify</strong> (grátis)<br>
+      <strong>Backend/Banco:</strong> <strong>Supabase</strong> — mesmo banco e auth da opção A</p>
+      <div class="pros-cons" style="margin-top:8px">
+        <div class="pros"><h4>Pontos fortes</h4><ul>
+          <li>Arquitetura mais simples — sem SSR (server-side rendering)</li>
+          <li>Mesmo banco robusto da opção A</li>
+          <li>Fácil de entender e modificar</li>
+        </ul></div>
+        <div class="cons"><h4>Atenção</h4><ul>
+          <li>Carregamento inicial um pouco mais lento no celular</li>
+          <li>Sem SSR, não há cache de servidor — tudo no cliente</li>
+          <li>Mesma limitação de pausa do Supabase</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>React + Firebase (Google)</h3>
+      <p style="margin-bottom:8px"><strong>Frontend:</strong> React + Tailwind &nbsp;→&nbsp; deploy no <strong>Firebase Hosting</strong> (grátis)<br>
+      <strong>Backend/Banco:</strong> <strong>Firebase</strong> — Firestore (NoSQL) + Auth + Hosting tudo numa plataforma</p>
+      <div class="pros-cons" style="margin-top:8px">
+        <div class="pros"><h4>Pontos fortes</h4><ul>
+          <li>Tudo na mesma plataforma (Google) — nunca pausa</li>
+          <li>Free tier generoso (50K leituras/dia)</li>
+        </ul></div>
+        <div class="cons"><h4>Atenção</h4><ul>
+          <li>Banco NoSQL — queries financeiras complexas são mais difíceis (sem JOIN nativo)</li>
+          <li>Relatórios e filtros cruzados entre empresas/meses exigem mais lógica no cliente</li>
+          <li>Menos adequado para dados relacionais como os do Excel</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:24px">Clique para selecionar ou responda no terminal. A opção A é a recomendada para dados financeiros relacionais.</p>
