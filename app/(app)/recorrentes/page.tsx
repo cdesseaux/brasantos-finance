@@ -1,3 +1,23 @@
-export default function RecorrentesPage() {
-  return <div className="p-6"><h1 className="text-2xl font-bold">Recorrentes</h1></div>
+import { getRecurringTemplates } from '@/lib/db/recurring-templates'
+import { getCompanies } from '@/lib/db/companies'
+import { getSuppliers } from '@/lib/db/suppliers'
+import { getChartOfAccounts } from '@/lib/db/chart-of-accounts'
+import { RecorrentesClient } from '@/components/recorrentes/recorrentes-client'
+
+export default async function RecorrentesPage() {
+  const [templates, companies, suppliers, accounts] = await Promise.all([
+    getRecurringTemplates(),
+    getCompanies(),
+    getSuppliers(),
+    getChartOfAccounts(),
+  ])
+
+  return (
+    <RecorrentesClient
+      templates={templates ?? []}
+      companies={companies ?? []}
+      suppliers={suppliers ?? []}
+      accounts={accounts ?? []}
+    />
+  )
 }
