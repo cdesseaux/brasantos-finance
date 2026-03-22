@@ -9,12 +9,12 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
 const navItems = [
-  { href: '/lancamentos', label: 'Lançamentos', icon: List },
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/recorrentes', label: 'Recorrentes', icon: RefreshCw },
-  { href: '/analise', label: 'Análise de Clientes', icon: Users },
-  { href: '/relatorios', label: 'Relatórios', icon: FileText },
-  { href: '/cadastros/empresas', label: 'Cadastros', icon: Database },
+  { href: '/lancamentos', label: 'Lançamentos', icon: List, activePrefix: '/lancamentos' },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, activePrefix: '/dashboard' },
+  { href: '/recorrentes', label: 'Recorrentes', icon: RefreshCw, activePrefix: '/recorrentes' },
+  { href: '/analise', label: 'Análise de Clientes', icon: Users, activePrefix: '/analise' },
+  { href: '/relatorios', label: 'Relatórios', icon: FileText, activePrefix: '/relatorios' },
+  { href: '/cadastros/empresas', label: 'Cadastros', icon: Database, activePrefix: '/cadastros' },
 ]
 
 export function Sidebar() {
@@ -33,11 +33,11 @@ export function Sidebar() {
         Brasantos Finance
       </div>
       <nav className="flex-1 p-2 space-y-1">
-        {navItems.map(({ href, label, icon: Icon }) => (
+        {navItems.map(({ href, label, icon: Icon, activePrefix }) => (
           <Link key={href} href={href}
             className={cn(
               'flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors',
-              pathname.startsWith(href)
+              pathname.startsWith(activePrefix)
                 ? 'bg-blue-600 text-white'
                 : 'hover:bg-slate-800 hover:text-white'
             )}>
