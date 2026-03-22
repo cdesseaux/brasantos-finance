@@ -110,7 +110,7 @@ CREATE TABLE recurring_templates (
 -- Expense transactions
 CREATE TABLE expense_transactions (
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-  competencia text NOT NULL,  -- MM/YY (e.g. '1/26')
+  competencia text NOT NULL,  -- YYYY-MM (e.g. '2026-01')
   account_id uuid REFERENCES chart_of_accounts(id),
   company_id uuid REFERENCES companies(id),
   client_id uuid REFERENCES clients(id),
@@ -124,9 +124,9 @@ CREATE TABLE expense_transactions (
   payment_date date,
   status text NOT NULL DEFAULT 'A PAGAR'
     CHECK (status IN ('PAGO', 'A PAGAR', 'A VERIFICAR')),
-  principal numeric(12,2) DEFAULT 0,
-  fine numeric(12,2) DEFAULT 0,
-  interest numeric(12,2) DEFAULT 0,
+  principal numeric(12,2) NOT NULL DEFAULT 0,
+  fine numeric(12,2) NOT NULL DEFAULT 0,
+  interest numeric(12,2) NOT NULL DEFAULT 0,
   total numeric(12,2) GENERATED ALWAYS AS (principal + fine + interest) STORED,
   recurring_template_id uuid REFERENCES recurring_templates(id),
   created_by uuid REFERENCES auth.users(id),
@@ -137,7 +137,7 @@ CREATE TABLE expense_transactions (
 -- Revenue transactions (NF)
 CREATE TABLE revenue_transactions (
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-  competencia text NOT NULL,
+  competencia text NOT NULL,  -- YYYY-MM (e.g. '2026-01')
   company_id uuid REFERENCES companies(id),
   client_id uuid REFERENCES clients(id),
   account_id uuid REFERENCES chart_of_accounts(id),
@@ -197,6 +197,7 @@ CREATE INDEX idx_expense_due_date ON expense_transactions(due_date);
 CREATE INDEX idx_revenue_competencia ON revenue_transactions(competencia);
 CREATE INDEX idx_revenue_company ON revenue_transactions(company_id);
 CREATE INDEX idx_revenue_client ON revenue_transactions(client_id);
+CREATE INDEX idx_revenue_due_date ON revenue_transactions(due_date);
 
 -- Auto-update updated_at
 CREATE OR REPLACE FUNCTION update_updated_at()
@@ -216,7 +217,7 @@ BEGIN
   INSERT INTO profiles(id, email) VALUES (NEW.id, NEW.email);
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users

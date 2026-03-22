@@ -132,7 +132,7 @@ export interface Database {
       expense_transactions: {
         Row: {
           id: string
-          competencia: string
+          competencia: string  // YYYY-MM format, e.g. '2026-01'
           account_id: string | null
           company_id: string | null
           client_id: string | null
@@ -160,7 +160,7 @@ export interface Database {
       revenue_transactions: {
         Row: {
           id: string
-          competencia: string
+          competencia: string  // YYYY-MM format, e.g. '2026-01'
           company_id: string | null
           client_id: string | null
           account_id: string | null
