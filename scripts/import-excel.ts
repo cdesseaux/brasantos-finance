@@ -261,11 +261,9 @@ async function main(): Promise<void> {
         });
 
       if (records.length > 0) {
-        const { data, error } = await supabase
-          .from('clients')
-          .upsert(records, { onConflict: 'name' })
-          .select('id, name');
-        if (error) console.error('Clients upsert error:', error.message);
+        await supabase.from('clients').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        const { data, error } = await supabase.from('clients').insert(records).select('id, name');
+        if (error) console.error('Clients insert error:', error.message);
         else {
           (data ?? []).forEach((c: { id: string; name: string }) => {
             clientMap[c.name] = c.id;
@@ -322,11 +320,9 @@ async function main(): Promise<void> {
         });
 
       if (records.length > 0) {
-        const { data, error } = await supabase
-          .from('suppliers')
-          .upsert(records, { onConflict: 'name' })
-          .select('id, name');
-        if (error) console.error('Suppliers upsert error:', error.message);
+        await supabase.from('suppliers').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        const { data, error } = await supabase.from('suppliers').insert(records).select('id, name');
+        if (error) console.error('Suppliers insert error:', error.message);
         else {
           (data ?? []).forEach((s: { id: string; name: string }) => {
             supplierMap[s.name] = s.id;

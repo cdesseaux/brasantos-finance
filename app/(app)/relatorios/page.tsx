@@ -3,6 +3,7 @@ import { getExpenseTransactions } from '@/lib/db/expense-transactions'
 import { getCompanies } from '@/lib/db/companies'
 import { MonthlyReport } from '@/components/relatorios/monthly-report'
 import { RevenueExpenseChart } from '@/components/relatorios/revenue-expense-chart'
+import { PeriodSelect } from '@/components/relatorios/period-select'
 import { currentCompetencia, formatCompetencia, lastNMonths } from '@/lib/utils/date'
 
 export default async function RelatoriosPage({
@@ -29,17 +30,7 @@ export default async function RelatoriosPage({
     <div className="p-4 md:p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl font-bold">Relatórios — {formatCompetencia(comp)}</h1>
-        <div className="flex gap-2 text-sm">
-          <select
-            defaultValue={comp}
-            className="border rounded-md px-2 py-1 text-sm"
-            onChange={() => {}}  // URL navigation handled client-side or by native form
-          >
-            {lastNMonths(12).map(m => (
-              <option key={m} value={m}>{formatCompetencia(m)}</option>
-            ))}
-          </select>
-        </div>
+        <PeriodSelect value={comp} />
       </div>
 
       <div className="mb-8">

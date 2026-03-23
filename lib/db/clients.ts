@@ -1,4 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
+import type { Database } from '@/types/database'
+
+type ClientRow = Database['public']['Tables']['clients']['Row']
 
 export async function getClients(filters?: { segment?: string; status?: string }) {
   const supabase = await createClient()
@@ -12,6 +15,19 @@ export async function getClients(filters?: { segment?: string; status?: string }
 
 export async function getActiveClients() {
   return getClients({ status: 'ATIVO' })
+}
+
+export async function upsertClient(client: Partial<ClientRow> & { name: string }) {
+  const supabase = await createClient()
+  const { data, error } = await supabase.from('clients').upsert(client).select().single()
+  if (error) throw error
+  return data
+}
+
+export async function deleteClient(id: string) {
+  const supabase = await createClient()
+  const { error } = await supabase.from('clients').delete().eq('id', id)
+  if (error) throw error
 }
 
 export async function getRealClients() {

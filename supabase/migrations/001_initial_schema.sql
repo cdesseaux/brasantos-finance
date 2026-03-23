@@ -1,9 +1,6 @@
--- Enable UUID extension
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 -- Companies
 CREATE TABLE companies (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text NOT NULL UNIQUE,
   cnpj text,
   inscricao_municipal text,
@@ -14,7 +11,7 @@ CREATE TABLE companies (
 
 -- Chart of accounts (Plano de Contas Gerencial)
 CREATE TABLE chart_of_accounts (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   code text NOT NULL UNIQUE,
   account text NOT NULL,
   sub_account text,
@@ -27,7 +24,7 @@ CREATE TABLE chart_of_accounts (
 
 -- Clients
 CREATE TABLE clients (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   item text,
   uf text,
   status text DEFAULT 'ATIVO',
@@ -57,7 +54,7 @@ CREATE TABLE clients (
 
 -- Suppliers
 CREATE TABLE suppliers (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   item text,
   company_id uuid REFERENCES companies(id),
   name text NOT NULL,
@@ -87,7 +84,7 @@ CREATE TABLE profiles (
 
 -- Recurring expense templates
 CREATE TABLE recurring_templates (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text NOT NULL,
   company_id uuid REFERENCES companies(id),
   client_id uuid REFERENCES clients(id),
@@ -109,7 +106,7 @@ CREATE TABLE recurring_templates (
 
 -- Expense transactions
 CREATE TABLE expense_transactions (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   competencia text NOT NULL,  -- YYYY-MM (e.g. '2026-01')
   account_id uuid REFERENCES chart_of_accounts(id),
   company_id uuid REFERENCES companies(id),
@@ -136,7 +133,7 @@ CREATE TABLE expense_transactions (
 
 -- Revenue transactions (NF)
 CREATE TABLE revenue_transactions (
-  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   competencia text NOT NULL,  -- YYYY-MM (e.g. '2026-01')
   company_id uuid REFERENCES companies(id),
   client_id uuid REFERENCES clients(id),
