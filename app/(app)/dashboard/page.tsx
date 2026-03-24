@@ -3,6 +3,7 @@ import { getDueExpenses } from '@/lib/db/expense-transactions'
 import { getDueRevenues } from '@/lib/db/revenue-transactions'
 import { CompanyCard } from '@/components/dashboard/company-card'
 import { DueAlerts } from '@/components/dashboard/due-alerts'
+import { PeriodSelect } from '@/components/relatorios/period-select'
 import { formatBRL } from '@/lib/utils/currency'
 import { currentCompetencia, formatCompetencia } from '@/lib/utils/date'
 
@@ -29,7 +30,10 @@ export default async function DashboardPage({
 
   return (
     <div className="p-4 md:p-6">
-      <h1 className="text-xl font-bold mb-4">Dashboard — {formatCompetencia(comp)}</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-xl font-bold">Dashboard — {formatCompetencia(comp)}</h1>
+        <PeriodSelect value={comp} />
+      </div>
 
       <DueAlerts expenses={dueExpenses ?? []} revenues={dueRevenues ?? []} />
 

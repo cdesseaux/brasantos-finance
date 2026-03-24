@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { TransactionList, type Transaction } from './transaction-list'
 import { TransactionDrawer } from './transaction-drawer'
 import { deleteExpenseTransactionAction, deleteRevenueTransactionAction } from '@/app/(app)/lancamentos/actions'
+import { PeriodSelect } from '@/components/relatorios/period-select'
 
 interface Props {
   transactions: (Transaction & { [key: string]: unknown })[]
@@ -36,12 +37,14 @@ export function LancamentosClient({ transactions, companies, clients, suppliers,
     <div className="p-4 md:p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-xl font-bold">Lançamentos — {competenciaDisplay}</h1>
-        <button onClick={() => { setEditTarget(null); setDrawerOpen(true) }}
-          className="bg-blue-600 text-white text-sm px-4 py-2 rounded-md">
-          + Novo
-        </button>
+        <div className="flex items-center gap-2">
+          <PeriodSelect value={competencia} />
+          <button onClick={() => { setEditTarget(null); setDrawerOpen(true) }}
+            className="bg-blue-600 text-white text-sm px-4 py-2 rounded-md">
+            + Novo
+          </button>
+        </div>
       </div>
-      <div className="text-sm text-slate-500 mb-4">Competência: {competencia}</div>
 
       <TransactionList
         transactions={transactions}
