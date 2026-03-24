@@ -48,7 +48,8 @@ export function TransactionList({ transactions, onEdit, onDelete }: TransactionL
             <th className="p-3 text-left">Tipo</th>
             <th className="p-3 text-left">Empresa</th>
             <th className="p-3 text-left">Descrição</th>
-            <th className="p-3 text-left">Fornec./Cliente</th>
+            <th className="p-3 text-left">Fornecedor</th>
+            <th className="p-3 text-left">Cliente</th>
             <th className="p-3 text-left">Venc.</th>
             <th className="p-3 text-right">Total</th>
             <th className="p-3 text-left">Status</th>
@@ -58,7 +59,6 @@ export function TransactionList({ transactions, onEdit, onDelete }: TransactionL
         <tbody>
           {transactions.map(t => {
             const amount = t.type === 'revenue' ? (t.net_value ?? 0) : (t.total ?? 0)
-            const counterpart = t.type === 'revenue' ? t.clients?.name : t.suppliers?.name
             return (
               <tr key={t.id} className="border-t hover:bg-slate-50">
                 <td className="p-3">
@@ -68,7 +68,8 @@ export function TransactionList({ transactions, onEdit, onDelete }: TransactionL
                 </td>
                 <td className="p-3 text-xs text-slate-500">{t.companies?.name}</td>
                 <td className="p-3">{t.description}</td>
-                <td className="p-3 text-xs text-slate-500">{counterpart}</td>
+                <td className="p-3 text-xs text-slate-500">{t.suppliers?.name}</td>
+                <td className="p-3 text-xs text-slate-500">{t.clients?.name}</td>
                 <td className="p-3 text-xs">{formatDate(t.due_date)}</td>
                 <td className={`p-3 text-right font-medium ${t.type === 'revenue' ? 'text-green-600' : ''}`}>
                   {formatBRL(amount)}
@@ -108,7 +109,9 @@ export function TransactionList({ transactions, onEdit, onDelete }: TransactionL
                 <div>
                   <p className="font-medium text-sm">{t.description}</p>
                   <p className="text-xs text-slate-500 mt-1">
-                    {t.companies?.name} · {t.type === 'revenue' ? t.clients?.name : t.suppliers?.name}
+                    {t.companies?.name}
+                    {t.suppliers?.name && ` · ${t.suppliers.name}`}
+                    {t.clients?.name && ` · ${t.clients.name}`}
                   </p>
                   <p className="text-xs text-slate-400">{formatDate(t.due_date)}</p>
                 </div>
