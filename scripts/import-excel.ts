@@ -65,11 +65,13 @@ function mapExpenseStatus(raw: string | null | undefined): 'PAGO' | 'A PAGAR' | 
 
 // Status mapping for revenue transactions
 // DB enum: 'RECEBIDO' | 'A RECEBER' | 'A VERIFICAR'
+// Monthly sheets use expense-style status (PAGO/A PAGAR) — map to revenue equivalents
 function mapRevenueStatus(raw: string | null | undefined): 'RECEBIDO' | 'A RECEBER' | 'A VERIFICAR' {
   const s = (raw ?? '').trim().toUpperCase();
-  if (s === 'RECEBIDO') return 'RECEBIDO';
-  if (s === 'A RECEBER') return 'A RECEBER';
-  return 'A RECEBER'; // default for revenue
+  if (s === 'RECEBIDO' || s === 'PAGO') return 'RECEBIDO';
+  if (s === 'A RECEBER' || s === 'A PAGAR') return 'A RECEBER';
+  if (s === 'A VERIFICAR') return 'A VERIFICAR';
+  return 'A RECEBER'; // default
 }
 
 // ---------------------------------------------------------------------------
@@ -357,147 +359,50 @@ async function main(): Promise<void> {
   }
 
   // -----------------------------------------------------------------------
-  // 5. Revenue transactions (2026_RECEITA_* sheets)
-  //    Data starts at row index 16 (rows 0-12 are metadata/headers).
-  //    Cols: 0=COMP, 1=NF, 2=CLIENTE, 3=VALOR TOTAL,
-  //          4=MATERIAS, 5=EQUIPAMENTOS,
-  //          6=VT44_QTY, 7=VT44_UNIT, 8=VT44_DAYS, 9=VT44_TOTAL,
-  //          10=VT12_QTY, 11=VT12_UNIT, 12=VT12_DAYS, 13=VT12_TOTAL,
-  //          14=VT_TOTAL (skip - not in schema),
-  //          15=VA44_QTY, 16=VA44_UNIT, 17=VA44_DAYS, 18=VA44_TOTAL,
-  //          19=VA12_QTY, 20=VA12_UNIT, 21=VA12_DAYS, 22=VA12_TOTAL,
-  //          23=VA_TOTAL (skip),
-  //          24=UNIF44_QTY, 25=UNIF44_UNIT, 26=UNIF44_YEAR, 27=UNIF44_TOTAL,
-  //          28=UNIF12_QTY, 29=UNIF12_UNIT, 30=UNIF12_YEAR, 31=UNIF12_TOTAL,
-  //          32=UNIF_TOTAL (skip),
-  //          33=RETENTION_BASE_INSS, 34=CALC_BASE_INSS,
-  //          35=GPS_2632(RETENÇÃO), 36=IRPJ_2089, 37=CSLL_2372,
-  //          38=COFINS_2172, 39=PIS_8109, 40=ISSQN_1732,
-  //          41=TOTAL_RETENTION, 42=TOTAL_RETENÇÃO_NF (skip),
-  //          43=NET_VALUE
-  //    Revenue sheet name contains company name: extract from it.
+  // 5. Revenue transactions — sourced from monthly sheets (step 6 below)
+  //    The 2026_RECEITA_* sheets are NOT used: they lack STATUS/payment data.
+  //    Revenue rows are identified in monthly sheets by CONTA containing "RECEITA".
   // -----------------------------------------------------------------------
-  console.log('\n--- Importing Revenue Transactions ---');
+  console.log('\n--- Revenue transactions will be extracted from monthly sheets (step 6) ---');
 
-  const revenueSheets = wb.SheetNames.filter(n => n.includes('RECEITA'));
-  let totalRevenue = 0;
-
-  for (const sheetName of revenueSheets) {
-    const ws = wb.Sheets[sheetName];
-    if (!ws) continue;
-
-    // Derive company name from sheet: '2026_RECEITA_BRASANTOS' → 'BRASANTOS'
-    //  '2026_RECEITA _JJB SERV' → 'JJB SERV'
-    //  '2026_RECEITA_JJB ADM' → 'JJB ADM'
-    const companyFromSheet = sheetName.replace(/^2026_RECEITA\s*_\s*/i, '').trim();
-    const companyId = companyMap[companyFromSheet] ?? null;
-
-    const rows: unknown[][] = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
-    // Data rows start at index 16 (0-indexed)
-    const dataRows = rows.slice(16);
-
-    const records: Record<string, unknown>[] = [];
-
-    for (const row of dataRows) {
-      // Skip blank rows
-      if (row[0] == null && row[1] == null && row[2] == null) continue;
-
-      const competencia = toCompetencia(row[0] as string | number | null);
-      if (!competencia) continue;
-
-      const clientName = row[2] ? String(row[2]).trim() : null;
-      if (!clientName) continue;
-
-      const clientId = clientName
-        ? (clientMap[`${companyFromSheet}|${clientName}`] ?? clientMap[clientName] ?? null)
-        : null;
-      if (clientName && !clientId) {
-        console.warn(`  [WARN] revenue client not found: company="${companyFromSheet}" client="${clientName}"`);
-      }
-      const nfNumber = row[1] != null ? String(row[1]).trim() : null;
-
-      const n = (v: unknown): number => (v != null && typeof v === 'number' ? v : 0);
-
-      records.push({
-        competencia,
-        company_id: companyId,
-        client_id: clientId,
-        account_id: null, // revenue account not directly specified per-row
-        nf_number: nfNumber,
-        status: mapRevenueStatus(null), // no status column in revenue sheet — default A RECEBER
-        total_services: n(row[3]),
-        materials: n(row[4]),
-        equipment: n(row[5]),
-        vt_44_qty: Math.round(n(row[6])),
-        vt_44_unit: n(row[7]),
-        vt_44_days: Math.round(n(row[8])),
-        vt_44_total: n(row[9]),
-        vt_12_qty: Math.round(n(row[10])),
-        vt_12_unit: n(row[11]),
-        vt_12_days: Math.round(n(row[12])),
-        vt_12_total: n(row[13]),
-        va_44_qty: Math.round(n(row[15])),
-        va_44_unit: n(row[16]),
-        va_44_days: Math.round(n(row[17])),
-        va_44_total: n(row[18]),
-        va_12_qty: Math.round(n(row[19])),
-        va_12_unit: n(row[20]),
-        va_12_days: Math.round(n(row[21])),
-        va_12_total: n(row[22]),
-        unif_44_qty: Math.round(n(row[24])),
-        unif_44_unit: n(row[25]),
-        unif_44_year: Math.round(n(row[26])),
-        unif_44_total: n(row[27]),
-        unif_12_qty: Math.round(n(row[28])),
-        unif_12_unit: n(row[29]),
-        unif_12_year: Math.round(n(row[30])),
-        unif_12_total: n(row[31]),
-        retention_base_inss: n(row[33]),
-        calc_base_inss: n(row[34]),
-        gps_2632: n(row[35]),
-        irpj_2089: n(row[36]),
-        csll_2372: n(row[37]),
-        cofins_2172: n(row[38]),
-        pis_8109: n(row[39]),
-        issqn_1732: n(row[40]),
-        total_retention: n(row[41]),
-        net_value: n(row[43]),
-      });
-    }
-
-    if (records.length > 0) {
-      // revenue_transactions has no unique constraint suitable for upsert;
-      // use insert with ignoreDuplicates=false — run is idempotent via truncate+insert pattern,
-      // but since we can't truncate safely, use insert (script is meant to run once).
-      const { error } = await supabase
-        .from('revenue_transactions')
-        .insert(records);
-      if (error) console.error(`Revenue [${sheetName}] insert error:`, error.message);
-      else {
-        totalRevenue += records.length;
-        console.log(`  [${sheetName}] inserted ${records.length} revenue transactions`);
-      }
-    }
-  }
-  console.log(`  Total revenue transactions inserted: ${totalRevenue}`);
+  // Clear existing revenue_transactions before re-importing
+  console.log('  Deleting existing revenue_transactions...');
+  const { error: delRevErr } = await supabase
+    .from('revenue_transactions')
+    .delete()
+    .neq('id', '00000000-0000-0000-0000-000000000000');
+  if (delRevErr) console.error('  Delete revenue_transactions error:', delRevErr.message);
+  else console.log('  Existing revenue_transactions deleted.');
 
   // -----------------------------------------------------------------------
-  // 6. Expense transactions (monthly sheets: JAN, FEV, ..., DEZ)
-  //    Also includes 2026_MATRIZ_DESPESAS (same structure, month=FEV/MAR).
+  // 6. Monthly sheets (JAN, FEV, ..., DEZ + 2026_MATRIZ_DESPESAS)
   //    Header row: index 4
   //    Cols: 0=COMPETÊNCIA, 1=CONTA, 2=CÓDIGO CONTABIL, 3=DESCRIÇÃO CONTABIL,
   //          4=EMPRESA, 5=CLIENTE, 6=TIPO DE DOCUMENTO, 7=Nº,
   //          8=FORNECEDOR, 9=DESCRIÇÃO, 10=PARC, 11=EMISSÃO,
   //          12=VENC., 13=PAGAMENTO, 14=STATUS,
   //          15=PRINCIPAL, 16=MULTA, 17=JUROS, 18=TOTAL
+  //
+  //    Rows where CONTA contains "RECEITA" → revenue_transactions
+  //    All other rows                       → expense_transactions
   // -----------------------------------------------------------------------
-  console.log('\n--- Importing Expense Transactions ---');
+  console.log('\n--- Importing Monthly Transactions (Expenses + Revenues) ---');
+
+  // Clear existing expense_transactions before re-importing
+  console.log('  Deleting existing expense_transactions...');
+  const { error: delExpErr } = await supabase
+    .from('expense_transactions')
+    .delete()
+    .neq('id', '00000000-0000-0000-0000-000000000000');
+  if (delExpErr) console.error('  Delete expense_transactions error:', delExpErr.message);
+  else console.log('  Existing expense_transactions deleted.');
 
   const monthSheetNames = wb.SheetNames.filter(n =>
     Object.keys(MONTH_MAP).includes(n) || n === '2026_MATRIZ_DESPESAS'
   );
 
   let totalExpense = 0;
+  let totalRevenue = 0;
 
   for (const sheetName of monthSheetNames) {
     const ws = wb.Sheets[sheetName];
@@ -507,7 +412,8 @@ async function main(): Promise<void> {
     // Row 4 is header, data starts at row 5 (index 5)
     const dataRows = rows.slice(5);
 
-    const records: Record<string, unknown>[] = [];
+    const expenseRecords: Record<string, unknown>[] = [];
+    const revenueRecords: Record<string, unknown>[] = [];
 
     for (const row of dataRows) {
       // Skip rows where all key cells are null
@@ -519,6 +425,9 @@ async function main(): Promise<void> {
       const principal = row[15] != null && typeof row[15] === 'number' ? row[15] : 0;
       // Skip rows with zero value that look like subtotal/separator rows
       if (principal === 0 && row[9] == null) continue;
+
+      const conta = row[1] ? String(row[1]).trim().toUpperCase() : '';
+      const isRevenue = conta.includes('RECEITA');
 
       const companyName = row[4] ? String(row[4]).trim() : null;
       const clientName = row[5] ? String(row[5]).trim() : null;
@@ -538,42 +447,61 @@ async function main(): Promise<void> {
       const issueDate = typeof row[11] === 'number' ? excelDateToISO(row[11] as number) : null;
       const dueDate = typeof row[12] === 'number' ? excelDateToISO(row[12] as number) : null;
       const paymentDate = typeof row[13] === 'number' ? excelDateToISO(row[13] as number) : null;
-
       const rawStatus = row[14] ? String(row[14]) : null;
-      const status = mapExpenseStatus(rawStatus);
 
-      records.push({
-        competencia,
-        account_id: accountId,
-        company_id: companyId,
-        client_id: clientId,
-        supplier_id: supplierId,
-        doc_type: row[6] ? String(row[6]).trim() : null,
-        doc_number: row[7] != null ? String(row[7]).trim() : null,
-        description: row[9] ? String(row[9]).trim() : null,
-        installment: row[10] ? String(row[10]).trim() : null,
-        issue_date: issueDate,
-        due_date: dueDate,
-        payment_date: paymentDate,
-        status,
-        principal: principal as number,
-        fine: (row[16] != null && typeof row[16] === 'number' ? row[16] : 0) as number,
-        interest: (row[17] != null && typeof row[17] === 'number' ? row[17] : 0) as number,
-      });
-    }
-
-    if (records.length > 0) {
-      const { error } = await supabase
-        .from('expense_transactions')
-        .insert(records);
-      if (error) console.error(`Expenses [${sheetName}] insert error:`, error.message);
-      else {
-        totalExpense += records.length;
-        console.log(`  [${sheetName}] inserted ${records.length} expense transactions`);
+      if (isRevenue) {
+        revenueRecords.push({
+          competencia,
+          company_id: companyId,
+          client_id: clientId,
+          account_id: accountId,
+          nf_number: row[7] != null ? String(row[7]).trim() : null,
+          status: mapRevenueStatus(rawStatus),
+          issue_date: issueDate,
+          due_date: dueDate,
+          payment_date: paymentDate,
+          net_value: principal as number,
+          // NF breakdown fields not available in monthly sheets — left null
+        });
+      } else {
+        expenseRecords.push({
+          competencia,
+          account_id: accountId,
+          company_id: companyId,
+          client_id: clientId,
+          supplier_id: supplierId,
+          doc_type: row[6] ? String(row[6]).trim() : null,
+          doc_number: row[7] != null ? String(row[7]).trim() : null,
+          description: row[9] ? String(row[9]).trim() : null,
+          installment: row[10] ? String(row[10]).trim() : null,
+          issue_date: issueDate,
+          due_date: dueDate,
+          payment_date: paymentDate,
+          status: mapExpenseStatus(rawStatus),
+          principal: principal as number,
+          fine: (row[16] != null && typeof row[16] === 'number' ? row[16] : 0) as number,
+          interest: (row[17] != null && typeof row[17] === 'number' ? row[17] : 0) as number,
+        });
       }
     }
+
+    if (expenseRecords.length > 0) {
+      const { error } = await supabase.from('expense_transactions').insert(expenseRecords);
+      if (error) console.error(`Expenses [${sheetName}] insert error:`, error.message);
+      else {
+        totalExpense += expenseRecords.length;
+        console.log(`  [${sheetName}] expenses: ${expenseRecords.length}, revenues: ${revenueRecords.length}`);
+      }
+    }
+
+    if (revenueRecords.length > 0) {
+      const { error } = await supabase.from('revenue_transactions').insert(revenueRecords);
+      if (error) console.error(`Revenues [${sheetName}] insert error:`, error.message);
+      else totalRevenue += revenueRecords.length;
+    }
   }
-  console.log(`  Total expense transactions inserted: ${totalExpense}`);
+  console.log(`  Total expense transactions: ${totalExpense}`);
+  console.log(`  Total revenue transactions: ${totalRevenue}`);
 
   console.log('\nImport complete.');
 }
