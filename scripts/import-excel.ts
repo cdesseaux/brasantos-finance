@@ -262,13 +262,28 @@ async function main(): Promise<void> {
 
       if (records.length > 0) {
         await supabase.from('clients').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-        const { data, error } = await supabase.from('clients').insert(records).select('id, name');
-        if (error) console.error('Clients insert error:', error.message);
-        else {
-          (data ?? []).forEach((c: { id: string; name: string }) => {
-            clientMap[c.name] = c.id;
+        const { error: insertError } = await supabase.from('clients').insert(records);
+        if (insertError) console.error('Clients insert error:', insertError.message);
+        else console.log(`  Inserted ${records.length} clients`);
+
+        // Rebuild clientMap from DB (resilient to partial insert responses)
+        const { data: allClients, error: selectError } = await supabase
+          .from('clients')
+          .select('id, name, company_id');
+        if (selectError) {
+          console.error('Clients select error:', selectError.message);
+        } else {
+          const companyNameById: Record<string, string> = Object.fromEntries(
+            Object.entries(companyMap).map(([name, id]) => [id, name])
+          );
+          (allClients ?? []).forEach((c: { id: string; name: string; company_id: string | null }) => {
+            clientMap[c.name] = c.id; // fallback: name-only key
+            if (c.company_id) {
+              const cn = companyNameById[c.company_id];
+              if (cn) clientMap[`${cn}|${c.name}`] = c.id; // primary: company|name key
+            }
           });
-          console.log(`  Upserted ${records.length} clients`);
+          console.log(`  clientMap populated with ${Object.keys(clientMap).length} entries`);
         }
       }
     }
@@ -385,7 +400,12 @@ async function main(): Promise<void> {
       const clientName = row[2] ? String(row[2]).trim() : null;
       if (!clientName) continue;
 
-      const clientId = clientName ? (clientMap[clientName] ?? null) : null;
+      const clientId = clientName
+        ? (clientMap[`${companyFromSheet}|${clientName}`] ?? clientMap[clientName] ?? null)
+        : null;
+      if (clientName && !clientId) {
+        console.warn(`  [WARN] revenue client not found: company="${companyFromSheet}" client="${clientName}"`);
+      }
       const nfNumber = row[1] != null ? String(row[1]).trim() : null;
 
       const n = (v: unknown): number => (v != null && typeof v === 'number' ? v : 0);
@@ -498,7 +518,12 @@ async function main(): Promise<void> {
       const accountCode = row[2] ? String(row[2]).trim() : null;
 
       const companyId = companyName ? (companyMap[companyName] ?? null) : null;
-      const clientId = clientName ? (clientMap[clientName] ?? null) : null;
+      const clientId = clientName
+        ? (clientMap[`${companyName}|${clientName}`] ?? clientMap[clientName] ?? null)
+        : null;
+      if (clientName && !clientId) {
+        console.warn(`  [WARN] client not found: company="${companyName}" client="${clientName}"`);
+      }
       const supplierId = supplierName ? (supplierMap[supplierName] ?? null) : null;
       const accountId = accountCode ? (accountMap[accountCode] ?? null) : null;
 
