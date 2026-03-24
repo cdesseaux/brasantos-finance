@@ -26,16 +26,31 @@ export interface Transaction {
   companies?: { name: string } | null
   clients?: { name: string } | null
   suppliers?: { name: string } | null
+  chart_of_accounts?: { code?: string; description: string; category?: string } | null
 }
 
 interface TransactionListProps {
   transactions: Transaction[]
   onEdit?: (t: Transaction) => void
   onDelete?: (id: string, type: 'expense' | 'revenue') => void
+  activeFilters?: boolean
+  onClearFilters?: () => void
 }
 
-export function TransactionList({ transactions, onEdit, onDelete }: TransactionListProps) {
+export function TransactionList({ transactions, onEdit, onDelete, activeFilters, onClearFilters }: TransactionListProps) {
   if (transactions.length === 0) {
+    if (activeFilters) {
+      return (
+        <div className="text-center py-8">
+          <p className="text-slate-500 text-sm">Nenhum lançamento encontrado para os filtros selecionados.</p>
+          {onClearFilters && (
+            <button onClick={onClearFilters} className="text-blue-600 text-sm mt-2 underline">
+              Limpar filtros
+            </button>
+          )}
+        </div>
+      )
+    }
     return <p className="text-slate-500 text-sm py-8 text-center">Nenhum lançamento encontrado.</p>
   }
 
