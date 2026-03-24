@@ -261,10 +261,14 @@ async function main(): Promise<void> {
         });
 
       if (records.length > 0) {
+        // Deduplicate by company_id+name (safety net for any remaining unique constraint)
+        const uniqueRecords = Object.values(
+          Object.fromEntries(records.map(r => [`${String(r.company_id)}|${r.name}`, r]))
+        );
         await supabase.from('clients').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-        const { error: insertError } = await supabase.from('clients').insert(records);
+        const { error: insertError } = await supabase.from('clients').insert(uniqueRecords);
         if (insertError) console.error('Clients insert error:', insertError.message);
-        else console.log(`  Inserted ${records.length} clients`);
+        else console.log(`  Inserted ${uniqueRecords.length} clients`);
 
         // Rebuild clientMap from DB (resilient to partial insert responses)
         const { data: allClients, error: selectError } = await supabase
@@ -335,14 +339,18 @@ async function main(): Promise<void> {
         });
 
       if (records.length > 0) {
+        // Deduplicate by company_id+name
+        const uniqueRecords = Object.values(
+          Object.fromEntries(records.map(r => [`${String(r.company_id)}|${r.name}`, r]))
+        );
         await supabase.from('suppliers').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-        const { data, error } = await supabase.from('suppliers').insert(records).select('id, name');
+        const { data, error } = await supabase.from('suppliers').insert(uniqueRecords).select('id, name');
         if (error) console.error('Suppliers insert error:', error.message);
         else {
           (data ?? []).forEach((s: { id: string; name: string }) => {
             supplierMap[s.name] = s.id;
           });
-          console.log(`  Upserted ${records.length} suppliers`);
+          console.log(`  Upserted ${uniqueRecords.length} suppliers`);
         }
       }
     }
