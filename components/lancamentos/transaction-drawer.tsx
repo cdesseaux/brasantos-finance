@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { ExpenseForm } from './expense-form'
 import { RevenueForm } from './revenue-form'
 import type { ExpenseFormData } from '@/schemas/expense'
@@ -38,10 +38,10 @@ export function TransactionDrawer({
           + Novo
         </button>
       )}
-      <Drawer open={open} onOpenChange={setOpen}>
-        <DrawerContent className="max-h-[95vh]">
-          <DrawerHeader>
-            <DrawerTitle>{initialData ? 'Editar Lançamento' : 'Novo Lançamento'}</DrawerTitle>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-xl w-full max-h-[90vh] overflow-y-auto" showCloseButton>
+          <DialogHeader>
+            <DialogTitle>{initialData ? 'Editar Lançamento' : 'Novo Lançamento'}</DialogTitle>
             {!initialData && (
               <div className="flex border rounded-md overflow-hidden mt-2">
                 <button type="button" onClick={() => setType('expense')}
@@ -54,29 +54,27 @@ export function TransactionDrawer({
                 </button>
               </div>
             )}
-          </DrawerHeader>
-          <div className="overflow-y-auto px-4 pb-8">
-            {type === 'expense' ? (
-              <ExpenseForm
-                onSuccess={() => setOpen(false)}
-                companies={companies}
-                clients={clients}
-                suppliers={suppliers}
-                accounts={accounts}
-                initialData={initialData?.type === 'expense' ? (initialData.data as Partial<ExpenseFormData> & { id?: string }) : undefined}
-              />
-            ) : (
-              <RevenueForm
-                onSuccess={() => setOpen(false)}
-                companies={companies}
-                clients={clients}
-                accounts={accounts}
-                initialData={initialData?.type === 'revenue' ? (initialData.data as Partial<RevenueFormData> & { id?: string }) : undefined}
-              />
-            )}
-          </div>
-        </DrawerContent>
-      </Drawer>
+          </DialogHeader>
+          {type === 'expense' ? (
+            <ExpenseForm
+              onSuccess={() => setOpen(false)}
+              companies={companies}
+              clients={clients}
+              suppliers={suppliers}
+              accounts={accounts}
+              initialData={initialData?.type === 'expense' ? (initialData.data as Partial<ExpenseFormData> & { id?: string }) : undefined}
+            />
+          ) : (
+            <RevenueForm
+              onSuccess={() => setOpen(false)}
+              companies={companies}
+              clients={clients}
+              accounts={accounts}
+              initialData={initialData?.type === 'revenue' ? (initialData.data as Partial<RevenueFormData> & { id?: string }) : undefined}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   )
 }
