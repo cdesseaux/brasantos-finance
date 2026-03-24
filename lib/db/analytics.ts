@@ -50,27 +50,48 @@ export async function getClientDREData(competencia: string) {
 
   const totalHoldingRevenue = revenues?.reduce((s, r) => s + (r.net_value ?? 0), 0) ?? 0
 
-  // Overhead = expenses linked to ADM/OPERACIONAL clients or null client_id
+  // Overhead = expenses linked to ADM/OPERACIONAL clients (by name or segment) or null client_id
+  function clientInfo(raw: unknown): { name: string; segment: string } | null {
+    const c = raw as { clients?: { name: string; segment: string } | { name: string; segment: string }[] | null }
+    const clients = c.clients
+    if (!clients) return null
+    return Array.isArray(clients) ? (clients[0] ?? null) : clients
+  }
+
+  function isIndirect(e: { client_id: unknown }): boolean {
+    if (!e.client_id) return true
+    const info = clientInfo(e)
+    const name = (info?.name ?? '').trim().toUpperCase()
+    const seg = (info?.segment ?? '').trim().toUpperCase()
+    return ['ADM', 'OPERACIONAL'].includes(seg) ||
+      name === 'ADM' || name === 'OPERACIONAL' ||
+      name.startsWith('ADM') || name.startsWith('OPERACIONAL')
+  }
+
   const overhead = expenses
-    ?.filter(e => {
-      const seg = (e as unknown as { client_id: string | null; total: number | null; clients: { segment: string } | null }).clients?.segment ?? ''
-      return !e.client_id || ['ADM', 'OPERACIONAL'].includes(seg)
-    })
+    ?.filter(e => isIndirect(e))
     .reduce((s, e) => s + (e.total ?? 0), 0) ?? 0
 
   const clientRevenue: Record<string, number> = {}
   const clientDirectExpense: Record<string, number> = {}
 
+  function isExcludedClient(row: { client_id: unknown }): boolean {
+    if (!row.client_id) return true
+    const info = clientInfo(row)
+    const name = (info?.name ?? '').trim().toUpperCase()
+    const seg = (info?.segment ?? '').trim().toUpperCase()
+    return ['ADM', 'OPERACIONAL', 'BANCO'].includes(seg) ||
+      name === 'ADM' || name === 'OPERACIONAL' || name === 'BANCO' ||
+      name.startsWith('ADM') || name.startsWith('OPERACIONAL')
+  }
+
   for (const r of revenues ?? []) {
-    const seg = (r as unknown as { client_id: string | null; net_value: number | null; clients: { name: string; segment: string } | null }).clients?.segment ?? ''
-    if (['ADM', 'OPERACIONAL', 'BANCO'].includes(seg)) continue
-    if (!r.client_id) continue
-    clientRevenue[r.client_id] = (clientRevenue[r.client_id] ?? 0) + (r.net_value ?? 0)
+    if (isExcludedClient(r)) continue
+    clientRevenue[r.client_id!] = (clientRevenue[r.client_id!] ?? 0) + (r.net_value ?? 0)
   }
   for (const e of expenses ?? []) {
-    const seg = (e as unknown as { client_id: string | null; total: number | null; clients: { name: string; segment: string } | null }).clients?.segment ?? ''
-    if (!e.client_id || ['ADM', 'OPERACIONAL', 'BANCO'].includes(seg)) continue
-    clientDirectExpense[e.client_id] = (clientDirectExpense[e.client_id] ?? 0) + (e.total ?? 0)
+    if (isExcludedClient(e)) continue
+    clientDirectExpense[e.client_id!] = (clientDirectExpense[e.client_id!] ?? 0) + (e.total ?? 0)
   }
 
   const results = Object.keys(clientRevenue).map(clientId => {
