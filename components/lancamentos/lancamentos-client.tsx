@@ -79,12 +79,12 @@ export function LancamentosClient({ transactions, companies, clients, suppliers,
       </div>
 
       {/* Filter bar */}
-      <div className="flex gap-2 flex-wrap mb-2">
+      <div className="flex gap-2 mb-2">
         {empresaOptions.length > 0 && (
           <select
             value={filters.empresa}
             onChange={e => setFilter('empresa', e.target.value)}
-            className="border rounded-md px-2 py-1 text-sm"
+            className="flex-1 min-w-0 border rounded-md px-2 py-1 text-sm"
           >
             <option value="">Empresa</option>
             {empresaOptions.map(o => <option key={o} value={o}>{o}</option>)}
@@ -93,7 +93,7 @@ export function LancamentosClient({ transactions, companies, clients, suppliers,
         <select
           value={filters.tipo}
           onChange={e => setFilter('tipo', e.target.value)}
-          className="border rounded-md px-2 py-1 text-sm"
+          className="flex-1 min-w-0 border rounded-md px-2 py-1 text-sm"
         >
           <option value="">Tipo</option>
           <option value="expense">Despesa</option>
@@ -103,7 +103,7 @@ export function LancamentosClient({ transactions, companies, clients, suppliers,
           <select
             value={filters.fornecedor}
             onChange={e => setFilter('fornecedor', e.target.value)}
-            className="border rounded-md px-2 py-1 text-sm"
+            className="flex-1 min-w-0 border rounded-md px-2 py-1 text-sm"
           >
             <option value="">Fornecedor</option>
             {fornecedorOptions.map(o => <option key={o} value={o}>{o}</option>)}
@@ -113,7 +113,7 @@ export function LancamentosClient({ transactions, companies, clients, suppliers,
           <select
             value={filters.cliente}
             onChange={e => setFilter('cliente', e.target.value)}
-            className="border rounded-md px-2 py-1 text-sm"
+            className="flex-1 min-w-0 border rounded-md px-2 py-1 text-sm"
           >
             <option value="">Cliente</option>
             {clienteOptions.map(o => <option key={o} value={o}>{o}</option>)}
@@ -123,7 +123,7 @@ export function LancamentosClient({ transactions, companies, clients, suppliers,
           <select
             value={filters.conta}
             onChange={e => setFilter('conta', e.target.value)}
-            className="border rounded-md px-2 py-1 text-sm"
+            className="flex-1 min-w-0 border rounded-md px-2 py-1 text-sm"
           >
             <option value="">Conta</option>
             {contaOptions.map(o => <option key={o} value={o}>{o}</option>)}
@@ -133,7 +133,7 @@ export function LancamentosClient({ transactions, companies, clients, suppliers,
           <select
             value={filters.status}
             onChange={e => setFilter('status', e.target.value)}
-            className="border rounded-md px-2 py-1 text-sm"
+            className="flex-1 min-w-0 border rounded-md px-2 py-1 text-sm"
           >
             <option value="">Status</option>
             {statusOptions.map(o => <option key={o} value={o}>{o}</option>)}
