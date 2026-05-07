@@ -10,7 +10,7 @@ export default async function AnalisePage({
 }: { searchParams: Promise<{ comp?: string }> }) {
   const params = await searchParams
   const comp = params.comp ?? currentCompetencia()
-  const year = parseInt(comp.split('-')[0])
+  const year = parseInt(comp.split('-')[0], 10)
   const { results, overhead, clients } = await getClientDREData(comp)
 
   const clientNames: Record<string, string> = {}
