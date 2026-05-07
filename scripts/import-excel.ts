@@ -117,6 +117,25 @@ async function main(): Promise<void> {
   const wb = XLSX.readFile(EXCEL_PATH);
 
   // -----------------------------------------------------------------------
+  // 0. Delete transactions first (FK dependencies: transactions → clients/suppliers)
+  //    Must run before deleting clients and suppliers to avoid FK constraint failures.
+  // -----------------------------------------------------------------------
+  console.log('\n--- Clearing existing transactions ---');
+  const { error: delRevErr } = await supabase
+    .from('revenue_transactions')
+    .delete()
+    .neq('id', '00000000-0000-0000-0000-000000000000');
+  if (delRevErr) console.error('  Delete revenue_transactions error:', delRevErr.message);
+  else console.log('  revenue_transactions cleared.');
+
+  const { error: delExpErr } = await supabase
+    .from('expense_transactions')
+    .delete()
+    .neq('id', '00000000-0000-0000-0000-000000000000');
+  if (delExpErr) console.error('  Delete expense_transactions error:', delExpErr.message);
+  else console.log('  expense_transactions cleared.');
+
+  // -----------------------------------------------------------------------
   // 1. Companies (TA Empresa)
   //    Cols: 0=EMPRESA, 1=CNPJ, 2=INSCRIÇÃO, 3=ENDEREÇO, 4=CEP
   // -----------------------------------------------------------------------
@@ -363,16 +382,6 @@ async function main(): Promise<void> {
   //    The 2026_RECEITA_* sheets are NOT used: they lack STATUS/payment data.
   //    Revenue rows are identified in monthly sheets by CONTA containing "RECEITA".
   // -----------------------------------------------------------------------
-  console.log('\n--- Revenue transactions will be extracted from monthly sheets (step 6) ---');
-
-  // Clear existing revenue_transactions before re-importing
-  console.log('  Deleting existing revenue_transactions...');
-  const { error: delRevErr } = await supabase
-    .from('revenue_transactions')
-    .delete()
-    .neq('id', '00000000-0000-0000-0000-000000000000');
-  if (delRevErr) console.error('  Delete revenue_transactions error:', delRevErr.message);
-  else console.log('  Existing revenue_transactions deleted.');
 
   // -----------------------------------------------------------------------
   // 6. Monthly sheets (JAN, FEV, ..., DEZ + 2026_MATRIZ_DESPESAS)
@@ -387,15 +396,6 @@ async function main(): Promise<void> {
   //    All other rows                       → expense_transactions
   // -----------------------------------------------------------------------
   console.log('\n--- Importing Monthly Transactions (Expenses + Revenues) ---');
-
-  // Clear existing expense_transactions before re-importing
-  console.log('  Deleting existing expense_transactions...');
-  const { error: delExpErr } = await supabase
-    .from('expense_transactions')
-    .delete()
-    .neq('id', '00000000-0000-0000-0000-000000000000');
-  if (delExpErr) console.error('  Delete expense_transactions error:', delExpErr.message);
-  else console.log('  Existing expense_transactions deleted.');
 
   const monthSheetNames = wb.SheetNames.filter(n =>
     Object.keys(MONTH_MAP).includes(n) || n === '2026_MATRIZ_DESPESAS'
