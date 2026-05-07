@@ -1,6 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ClientDREList } from '@/components/analise/client-dre-list'
 import { ClientCrossTable } from '@/components/analise/client-cross-table'
+import { PeriodSelect } from '@/components/relatorios/period-select'
 import { getClientDREData } from '@/lib/db/analytics'
 import { currentCompetencia, formatCompetencia } from '@/lib/utils/date'
 
@@ -9,6 +10,7 @@ export default async function AnalisePage({
 }: { searchParams: Promise<{ comp?: string }> }) {
   const params = await searchParams
   const comp = params.comp ?? currentCompetencia()
+  const year = parseInt(comp.split('-')[0])
   const { results, overhead, clients } = await getClientDREData(comp)
 
   const clientNames: Record<string, string> = {}
@@ -18,7 +20,10 @@ export default async function AnalisePage({
 
   return (
     <div className="p-4 md:p-6">
-      <h1 className="text-xl font-bold mb-4">Análise de Clientes — {formatCompetencia(comp)}</h1>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-xl font-bold">Análise de Clientes — {formatCompetencia(comp)}</h1>
+        <PeriodSelect value={comp} />
+      </div>
       <Tabs defaultValue="list">
         <TabsList>
           <TabsTrigger value="list">Por cliente</TabsTrigger>
@@ -28,7 +33,7 @@ export default async function AnalisePage({
           <ClientDREList results={results} overhead={overhead} clientNames={clientNames} />
         </TabsContent>
         <TabsContent value="table">
-          <ClientCrossTable year={new Date().getFullYear()} />
+          <ClientCrossTable year={year} />
         </TabsContent>
       </Tabs>
     </div>
